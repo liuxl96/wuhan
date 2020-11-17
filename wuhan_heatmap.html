@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>街道划分图显示</title>
+    <title>街道划分图及热力图</title>
     <!-- demo样式文件 -->
     <link rel="stylesheet" href="https://minedata.cn/api/static/demo/js-api/zh/css/demo.css">
+    
     <!-- 引入MineMap API插件 -->
     <link rel="stylesheet" href="https://minedata.cn/minemapapi/v2.1.0/minemap.css">
     <script src="https://minedata.cn/minemapapi/v2.1.0/minemap.js"></script>
@@ -47,13 +48,43 @@
     map.repaint = true; /*启动动画*/
 
     map.on('load',function(){
-        map.addSource("streetSource",{
+        map.addSource("streetSource",{ /*武汉街道数据*/
             "type":"geojson",
-            "data":"./wuhan_street_wgs84.geojson"
+            "data":"./wuhandata/wuhan_street_wgs84.geojson"
+        });
+        map.addSource("heatmapSource",{ /*武汉累计确诊数据*/
+            "type":"geojson",
+            "data":""
+        })
+
+        map.addLayer({  /*武汉确诊热力图层*/
+            "id":"heatmapLayer-confirmed-wuhan",
+            "type":"heatmap",
+            "source":"heatmapSource",
+            "layout":{
+                "visibility":"visible",
+            },
+            "paint":{
+                "heatmap-radius":30,    /*数据点的模糊范围，单位像素，默认30*/
+                "height-weight":{       /*单个数据点的热力程度*/
+                    "property":"mag",
+                    "stops":[[0,0],[10,1]]
+                },
+                "heatmap-intensity":1,
+                "heatmap-color":[
+                    "interpolate",
+                    ["linear"],
+                    ["heatmap-density"],
+                    0,"rgba()",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"
+                ],
+                "heatmap-opacity":1,    /*热力图的不透明度，默认1*/
+            },
+            "minzoom":6,
+            "maxzoom":12
         });
 
-        map.addLayer({
-            "id":"street-layer-1",
+        map.addLayer({    /*武汉街道层*/
+            "id":"streetLayer-wuhan",
             "type":"fill",
             "source":"streetSource",
             "layout":{
