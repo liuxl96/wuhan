@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>热力图图层</title>
+    <link rel="stylesheet" href="https://minedata.cn/api/static/demo/js-api/zh/css/demo.css">
+    <!-- 引入MineMap API插件 -->
+    <link rel="stylesheet" href="https://minedata.cn/minemapapi/v2.1.0/minemap.css">
+    <script src="https://minedata.cn/minemapapi/v2.1.0/minemap.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    /**
+     * 全局参数设置
+     */
+    minemap.domainUrl = 'https://minedata.cn';
+	minemap.dataDomainUrl = ['https://datahive.minedata.cn','https://datahive01.minedata.cn','https://datahive02.minedata.cn','https://datahive03.minedata.cn','https://datahive04.minedata.cn'];
+	minemap.spriteUrl = 'https://minedata.cn/minemapapi/v2.1.0/sprite/sprite';
+	minemap.serviceUrl = 'https://mineservice.minedata.cn/service/';
+
+    minemap.appKey = '16be596e00c44c86bb1569cb53424dc9';
+    minemap.solution = 12878;
+
+    var map = new minemap.Map({
+        container: 'map',
+        style: 'https://mineservice.minedata.cn/service/solu/style/id/12878',
+        center: [114.31667, 30.65667],
+        zoom: 8,
+        pitch: 60,
+        maxZoom: 17,
+        minZoom: 3
+    });
+
+    /**
+     * 创建地图对象后，开始加载地图资源，地图资源加载完成后触发load事件
+     */
+    map.on('load', function () {
+        // 增加自定义数据源、自定义图层
+        addSources();
+        addLayers();
+    });
+
+    function addSources() {
+        //添加数据源,该热力图效果，数据源类型支持geojson或vector两种形式
+        map.addSource("heatmapSource", {
+            type: "geojson",
+            data: "../wuhandata/daily_json/2020-01-01.json"/*可以是具体的服务*/
+        });
+    }
+
+    function addLayers() {
+        map.addLayer({
+            "id": "heatmapLayer",
+            "type": "heatmap",
+            "source": "heatmapSource",
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                // 一个热力图数据点的模糊范围，单位是像素，默认值30；要求：值大于等于1，可根据zoom level进行插值设置
+                "heatmap-radius": 30,
+                //一个热力图单个数据点的热力程度，默认值为1；要求：值大于等于0，支持使用property中某个的热力值
+                "heatmap-weight": {
+                    "property": "mag",
+                    "stops": [[0, 0], [10, 1]]
+                },
+                // 用于统一控制热力值的强度，默认值1；要求：值大于等于0，可根据zoom level进行插值设置
+                "heatmap-intensity": 1,
+                // 表示热力图颜色阶梯，阶梯的值域范围为0-1，默认值为["interpolate",["linear"],["heatmap-density"],0,"rgba(0, 0, 255, 0)",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"]
+                "heatmap-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["heatmap-density"],
+                    0, "rgba(0, 0, 255, 0)", 0.1, "royalblue", 0.3, "cyan", 0.5, "lime", 0.7, "yellow", 1, "red"
+                ],
+                // 表示热力图的不透明度，默认值1；值域范围0-1，可根据zoom level进行插值设置
+                "heatmap-opacity": 1,
+            }
+        });
+    }
+
+</script>
+</body>

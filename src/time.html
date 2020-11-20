@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <script>
+    var arr = ['2020-01-02.json','2020-01-03.json','c.json','e.json','f.json'];
+
+    for(let i=0; i<arr.length; i++){
+      setTimeout(function(){
+        str = '/data/' + arr[i] +'<br />'; 
+        document.write(str);
+      },i*3000)
+    }
+
+  </script>
+</body>
+</html>
